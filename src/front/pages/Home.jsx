@@ -1,52 +1,40 @@
-import React, { useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
-import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { Link } from "react-router-dom";
 
 export const Home = () => {
-
-	const { store, dispatch } = useGlobalReducer()
-
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
-
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
-
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
-
-			return data
-
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
-
-	}
-
-	useEffect(() => {
-		loadMessage()
-	}, [])
+	const hasSession = Boolean(sessionStorage.getItem("token"));
 
 	return (
-		<div className="text-center mt-5">
-			<h1 className="display-4">Hello Rigo!!</h1>
-			<p className="lead">
-				<img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-			</p>
-			<div className="alert alert-info">
-				{store.message ? (
-					<span>{store.message}</span>
-				) : (
-					<span className="text-danger">
-						Loading message from the backend (make sure your python 🐍 backend is running)...
-					</span>
-				)}
-			</div>
-		</div>
+		<main className="home-page">
+			<section className="hero-card">
+				<span className="eyebrow">Autenticación segura</span>
+				<h1>Flask + React con JWT</h1>
+				<p>
+					Un flujo simple de registro, inicio de sesión y acceso a una
+					página protegida mediante JSON Web Tokens.
+				</p>
+				<div className="hero-actions">
+					<Link className="auth-button primary-link" to={hasSession ? "/private" : "/signup"}>
+						{hasSession ? "Ir al área privada" : "Crear una cuenta"}
+					</Link>
+					{!hasSession && (
+						<Link className="secondary-link" to="/login">Iniciar sesión</Link>
+					)}
+				</div>
+				<div className="feature-grid" aria-label="Características del proyecto">
+					<article>
+						<strong>Contraseñas</strong>
+						<span>Guardadas de forma cifrada.</span>
+					</article>
+					<article>
+						<strong>Sesión</strong>
+						<span>Token conservado en sessionStorage.</span>
+					</article>
+					<article>
+						<strong>Protección</strong>
+						<span>Acceso privado validado por el backend.</span>
+					</article>
+				</div>
+			</section>
+		</main>
 	);
-}; 
+};
